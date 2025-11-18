@@ -60,6 +60,13 @@
             <artifactId>postgresql</artifactId>
         </dependency>
 
+        <!-- H2 for local/dev and tests -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
         <!-- FLYWAY MIGRATIONS -->
         <dependency>
             <groupId>org.flywaydb</groupId>
