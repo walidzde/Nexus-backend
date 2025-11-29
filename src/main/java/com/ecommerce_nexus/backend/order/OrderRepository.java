@@ -7,4 +7,8 @@ import java.util.List;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByUserOrderByCreatedAtDesc(User user);
+
+    boolean existsByTrackingCode(String trackingCode);
+
+    java.util.Optional<Order> findByTrackingCode(String trackingCode);
 }

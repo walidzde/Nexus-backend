@@ -19,5 +19,7 @@ public class OrderResponse {
     private OrderStatus status;
     private PaymentStatus paymentStatus;
     private Address shippingAddress;
+    private String email;
+    private String trackingCode;
     private List<OrderItemResponse> items;
 }

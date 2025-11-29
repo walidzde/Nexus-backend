@@ -43,6 +43,14 @@ public class Order {
     @Embedded
     private Address shippingAddress;
 
+    // Store the email associated with the order (for both guest and authenticated)
+    @Column(nullable = false)
+    private String email;
+
+    // Public tracking code to allow tracking without exposing numeric ID
+    @Column(nullable = false, unique = true, length = 40)
+    private String trackingCode;
+
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 

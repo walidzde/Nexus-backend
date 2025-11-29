@@ -13,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.security.SecureRandom;
+import java.util.Base64;
 
 @Service
 @RequiredArgsConstructor
@@ -45,6 +47,20 @@ public class OrderService {
         order.setStatus(OrderStatus.PENDING);
         order.setPaymentStatus(PaymentStatus.PENDING);
         order.setShippingAddress(request.getShippingAddress());
+
+        // Resolve and set email
+        if (user != null) {
+            order.setEmail(user.getEmail());
+        } else {
+            String email = request.getEmail();
+            if (email == null || email.isBlank()) {
+                throw new IllegalArgumentException("email is required for guest checkout");
+            }
+            order.setEmail(email.trim().toLowerCase());
+        }
+
+        // Generate a unique public tracking code
+        order.setTrackingCode(generateUniqueTrackingCode());
 
         BigDecimal total = BigDecimal.ZERO;
         for (CartItem ci : cart.getItems()) {
@@ -91,5 +107,23 @@ public class OrderService {
         if (auth == null) return null;
         Object principal = auth.getPrincipal();
         return (principal instanceof User) ? (User) principal : null;
+    }
+
+    private String generateUniqueTrackingCode() {
+        // URL-safe base64 without padding, 18 bytes -> 24 chars; prefix with 'ord_'
+        SecureRandom rnd = new SecureRandom();
+        byte[] bytes = new byte[18];
+        String code;
+        int attempts = 0;
+        do {
+            rnd.nextBytes(bytes);
+            code = "ord_" + Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+            attempts++;
+            if (attempts > 5) {
+                // fallback shorter attempt to avoid extreme loops
+                code = code.substring(0, Math.min(code.length(), 30));
+            }
+        } while (orderRepository.existsByTrackingCode(code));
+        return code;
     }
 }

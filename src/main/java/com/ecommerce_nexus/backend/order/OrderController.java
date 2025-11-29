@@ -3,6 +3,8 @@ package com.ecommerce_nexus.backend.order;
 import com.ecommerce_nexus.backend.order.dto.CheckoutRequest;
 import com.ecommerce_nexus.backend.order.dto.OrderItemResponse;
 import com.ecommerce_nexus.backend.order.dto.OrderResponse;
+import com.ecommerce_nexus.backend.order.dto.TrackOrderRequest;
+import com.ecommerce_nexus.backend.order.dto.TrackOrderResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,6 +19,7 @@ import java.util.List;
 public class OrderController {
 
     private final OrderService orderService;
+    private final TrackOrderService trackOrderService;
 
     @PostMapping("/checkout")
     public ResponseEntity<OrderResponse> checkout(@Valid @RequestBody CheckoutRequest request) {
@@ -33,6 +36,12 @@ public class OrderController {
     @GetMapping("/{id}")
     public ResponseEntity<OrderResponse> getOrder(@PathVariable Long id) {
         return ResponseEntity.ok(toResponse(orderService.getMyOrder(id)));
+    }
+
+    @PostMapping("/track")
+    public ResponseEntity<TrackOrderResponse> trackOrder(@Valid @RequestBody TrackOrderRequest request) {
+        TrackOrderResponse response = trackOrderService.track(request);
+        return ResponseEntity.ok(response);
     }
 
     private OrderResponse toResponse(Order o) {
@@ -52,6 +61,8 @@ public class OrderController {
                 .status(o.getStatus())
                 .paymentStatus(o.getPaymentStatus())
                 .shippingAddress(o.getShippingAddress())
+                .email(o.getEmail())
+                .trackingCode(o.getTrackingCode())
                 .items(items)
                 .build();
     }

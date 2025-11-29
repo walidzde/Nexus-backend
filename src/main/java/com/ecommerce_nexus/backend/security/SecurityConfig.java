@@ -80,6 +80,7 @@ public class SecurityConfig {
                         // allow guest cart usage and guest checkout
                         .requestMatchers("/api/cart/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/orders/checkout").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/orders/track").permitAll()
                         .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults());
